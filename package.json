@@ -1,16 +1,15 @@
 {
-    "name": "osc.js-examples-node",
+    "name": "osc.js-p5-om",
     "main": "server.js",
     "version": "0.1.1",
-    "description": "Example of how to use osc.js in Node.js.",
-    "author": "Colin Clark",
-    "homepage": "http://flockingjs.org/",
+    "description": "Sending OSC data from Opusmodus to P5",
+    "author": "Jorgalad",
+    "homepage": "http://jorgalad.com/",
     "repository": {
         "type": "git",
-        "url": "git://github.com/colinbdclark/osc.js-examples.git"
+        "url": "https://github.com/jorgalad/om-to-P5"
     },
     "readmeFilename": "README.md",
-    "bugs": "https://github.com/colinbdclark/osc.js/issues",
     "license": "(MIT OR GPL-2.0)",
     "keywords": [
         "Open Sound Control",
@@ -18,7 +17,7 @@
         "sound",
         "audio",
         "music",
-        "Flocking"
+        "Opusmodus"
     ],
     "dependencies": {
         "express": "^4.17.1",

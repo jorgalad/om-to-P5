@@ -24,15 +24,7 @@ function newConnection(socket) {
 }
 
 /// NOW RECEIVE FROM OM
-
-
-
 var osc = require("osc");
-
-/*******************
- * OSC Over Serial *
- *******************/
-
 // Instantiate a new OSC Serial Port.
 var serialPort = new osc.SerialPort({
     devicePath: process.argv[2] || "/dev/tty.usbmodem221361"
@@ -83,6 +75,7 @@ udpPort.on("ready", function () {
 });
 
 udpPort.on("message", function (oscMessage) {
+    var globalVar = { oscMessage };
     console.log(oscMessage);
 });
 
@@ -91,3 +84,4 @@ udpPort.on("error", function (err) {
 });
 
 udpPort.open();
+

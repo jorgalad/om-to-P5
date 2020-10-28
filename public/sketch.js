@@ -1,6 +1,8 @@
 
 //var socket = require('socket.io');
-socket = io();
+//socket = io();
+
+
 let width = 600;
 let height = 400;
 
@@ -63,7 +65,7 @@ class Ball {
     }
     show() {
         stroke(255);
-        strokeWeight(4);
+        strokeWeight(5);
         noFill()
         ellipse(this.x, this.y, 24, 24);
     }
