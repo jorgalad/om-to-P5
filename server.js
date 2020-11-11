@@ -1,15 +1,9 @@
-//Import Express and set to variable (which is also a function call)
 var express = require("express");
-// Create the App
 var app = express();
-// Listen to port 3000
 var server = app.listen(3000);
-// Use the public folder
-
 app.use(express.static("public"));
 var socket = require("socket.io");
 var io = socket(server);
-io.sockets.on("connection", sendToSketch);
 
 console.log("============ Server Running ============");
 
@@ -56,9 +50,9 @@ udpPort.on("ready", function () {
   });
 });
 
-//This is new
-udpPort.on("message", function (socket, oscMessage) {
-  sendToSketch(socket, oscMessage);
+udpPort.on("message", function (oscMessage) {
+  console.log(`server.js: `, oscMessage);
+  io.sockets.emit("receiveOSC", oscMessage);
 });
 
 udpPort.on("error", function (err) {
@@ -66,38 +60,3 @@ udpPort.on("error", function (err) {
 });
 
 udpPort.open();
-
-function sendToSketch(socket) {
-  // console.log(socket);
-  // console.log(oscMessage); //undefined
-  let bla = "Test String";
-  console.log(`This gets triggered`);
-  // console.log(socket.emit);
-  socket.broadcast.emit("connection", bla);
-  // socket.broadcast.emit("fromOM", oscMessage);
-  // console.log(data);
-}
-
-function sendData() {
-  socket.emit("func1", ball.y);
-  socket.emit("func2", ball.x);
-  //   console.log(ball.x); //Check in browser console
-}
-// OM Sends to Server
-// Server Receives the Message and Launches a function
-// Function sends the Message to Sketch (socket.emit)
-function newConnection(socket) {
-  console.log("new connection ID: " + socket.id);
-  //If there's a message called 'mouse', trigger the mouseMsg function
-  // socket.on("mouse", mouseMsg);
-  socket.on("test", oscMessage);
-
-  function oscMessage(data) {
-    //broadcast.emit sends the message back out
-    // socket.broadcast.emit("mouse", data);
-    // socket.broadcast.emit("test", oscMessage);
-    //The io.sockets refers to everything, so it will also send the message back to the sender
-    //io.sockets.emit('mouse', data);
-    console.log(data);
-  }
-}

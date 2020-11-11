@@ -1,73 +1,37 @@
-// var socket = require("socket.io");
-// Use import vs. Require
-
+// This is the Client, it send messages to the server but also receives shit
 var socket = io();
-let width = 600;
-let height = 400;
-
-//Write Function that receives Messages
 
 function setup() {
-  createCanvas(width, height);
-  // stroke(255);
-  frameRate(30);
+  createCanvas(600, 400);
+  background(51);
+
   socket = io.connect("http://localhost:3000");
-  socket.on("connection", simpleFunction);
-
-  ball = new Ball();
+  socket.on("receiveOSC", newDrawing);
 }
 
-function simpleFunction(bla) {
-  console.log(`Something received in Sketch`);
+function newDrawing(oscMessage) {
+  console.log(`sketch.js:`, oscMessage);
+  noStroke();
+  fill(255, 0, 100);
+  console.log(data);
+  ellipse(data.x, data.y, 12, 12);
+  console.log(oscMessage);
 }
 
-let y = 100;
-let x = 0;
-let color = 0;
+function mouseDragged() {
+  console.log(mouseX + "," + mouseY);
 
-let ball;
+  // This is what gets send (JS Object)
+  // var data = {
+  //   x: mouseX,
+  //   y: mouseY,
+  // };
+  //Now send it
+  // socket.emit("mouse", data);
 
-function draw() {
-  background(0);
-  ball.move();
-  ball.bounce();
-  ball.show();
-
-  // sendData();
+  noStroke();
+  fill(255);
+  ellipse(mouseX, mouseY, 12, 12);
 }
 
-//Probably don't need this ( I just need to receive messages (data), not send)
-function sendData() {
-  socket.emit("func1", ball.y);
-  socket.emit("func2", ball.x);
-  //   console.log(ball.x); //Check in browser console
-}
-
-// console.log(oscMessage);
-
-class Ball {
-  constructor() {
-    this.x = 300;
-    this.y = 200;
-    this.xspeed = 4;
-    this.yspeed = -3;
-  }
-  move() {
-    this.x = this.x + this.xspeed;
-    this.y = this.y + this.yspeed;
-  }
-  bounce() {
-    if (this.x > width || this.x < 0) {
-      this.xspeed = this.xspeed * -1;
-    }
-    if (this.y > height || this.y < 0) {
-      this.yspeed = this.yspeed * -1;
-    }
-  }
-  show() {
-    stroke(255);
-    strokeWeight(5);
-    noFill();
-    ellipse(this.x, this.y, 24, 24);
-  }
-}
+// function draw() {}
