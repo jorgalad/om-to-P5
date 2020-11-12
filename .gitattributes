@@ -1,0 +1,3 @@
+# Example of a `.gitattributes` file which reclassifies `.rb` files as Java:
+*.opmo linguist-language=Common-Lisp
+# Replace any whitespace in the language name with hyphens:

@@ -48,12 +48,7 @@ function inMessage(oscMessage) {
 
 function oscToBall(oscValues) {
   console.log(oscValues);
+  //Everytime a message is being received, redraw the image
+  //Actual values are not being used yet
   redraw();
-  // ball.bounce(25);
-  // ball = new Ball(oscValues);
-  // ball.move();
-  // ball.bounce();
-  // ball.show();
-  // noStroke();
-  // fill(255, 0, 100);
 }

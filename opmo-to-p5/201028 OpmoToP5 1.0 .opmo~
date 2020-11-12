@@ -1,7 +1,7 @@
 (defparameter P5 '(127.0.0.1 57121))
 (setf thd1 (create-osc-thread "thread1" P5))
-(send-osc-data thd1 '((0.0 1/2) (0.0 1/2) (20 2)
-                      (0.10876829 1) (0.12127061 11/2)))
+(send-osc-data thd1 '((0.0 1/16) (0.0 1/16) (20 2)
+                      (0.10876829 1/16) (0.12127061 1/8)))
 
 (end-osc-thread thd1)
 

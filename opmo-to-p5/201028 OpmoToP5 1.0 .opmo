@@ -1,8 +1,25 @@
+(progn
 (defparameter P5 '(127.0.0.1 57121))
 (setf thd1 (create-osc-thread "thread1" P5))
 (send-osc-data thd1 '((0.0 1/16) (0.0 1/16) (20 2)
                       (0.10876829 1/16) (0.12127061 1/8)))
 
-(end-osc-thread thd1)
-
+(ps 'gm
+    ;:fl (list ost.map5)
+    :cb (list'(
+      (q b2e3g3 mp -h.)
+      (q ds3fs3b3 mp -h.)
+      (q b2e3g3 mp -h.)
+      (q ds3fs3b3 mp -q h ds3fs3b3ds4 arp)
+      (h e3g3b3 a3c4e4 mp)
+      (q fs3a3c4 -q h c4e4g4 mp)
+      (h b3ds4fs4 b3e4g4 mp)
+      (h b2fs3a3ds4 e2e3g3b3 mp)))
+    :key-signature '(e min) 
+    :tempo 200
+    :title "Idea I")
 (setf mel1 (gen-repeat 16 '(e a3 c4 e4 d4)))
+
+)
+
+(end-osc-thread thd1)
