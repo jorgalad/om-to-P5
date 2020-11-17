@@ -1,0 +1,24 @@
+
+
+
+
+(setf mel1 (gen-repeat 8 '(
+                           (q c3 e f3 g3 gs3 g3 q. eb3)
+                           (e c3 e f3 g3 gs3 q. g3 q eb3 e d3 eb3 q c3)
+                           (q eb3 e d3 eb3 h c3))))
+
+(setf ts-list (get-time-signature mel1))
+
+(def-score filterExample
+             (:title "Filter Modulate"
+              :composer "Jorgalad"
+              :key-signature '(d min)
+              :time-signature ts-list
+              :tempo 20
+              :layout (grand-layout 'inst1))
+
+    (inst1
+     :omn mel1
+     :channel 4
+     :port "FROM OpusModus I"
+     ))

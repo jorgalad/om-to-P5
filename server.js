@@ -47,6 +47,7 @@ udpPort.on("ready", function () {
   ipAddresses.forEach(function (address) {
     //Here we see the address from Opusmodus
     console.log(" Host:", address + ", Port:", udpPort.options.localPort);
+    
   });
 });
 

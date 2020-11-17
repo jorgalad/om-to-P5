@@ -1,0 +1,150 @@
+;;MELODIES
+(setf mel-1 '(
+          #|1|# (e d4 cs4 h d4 tie e e e4 tie)
+          #|2|# (e e4 d4 q cs4 e d4 cs4 b3 as3)
+          #|3|# (q. g3 q fs3 e e3 fs3 g3)
+          #|4|# (e fs3 h g3 e fs3 g3 fs3 tie)
+          #|5|# (q fs3 e q e3 q. fs3)
+          #|6|# (e g3 h.. as3 tie)
+          #|7|# (h. as3 q cs4)
+          #|8|# (q cs4 q. b3 e cs4 q d4)
+          #|9|# (w d4 tie)
+          #|10|# (q d4 cs4 h e4)
+          #|11|# (q. g4 s g4as4 g4as4 e as4 q b4 e cs5)
+          #|12|# (h d5 q g5 g5 tie)
+          #|13|# (w g5)
+          #|14|# (e as5 q b5 cs6 e b5 as5 gs5 tie)
+          #|15|# (e gs5 g5 q. e5 e ds5 q e5 tie)
+          #|16|# (e e5 g5 q e5 h g5 tie)
+          #|17|# (h g5 e e5 q. g5 tie)
+          #|18|# (q. g5 h e5 e cs5 tie)
+          #|19|# (w cs5 tie)
+          #|20|# (e cs5 cs5 q. b4 q cs5 e ds5)
+          #|21|# (w e5 tie)
+          #|22|# (q. e5 q g5 gs5 e tie)
+          #|23|# (q gs5 h. e5 tie)
+          #|24|# (h e5 e cs5 q. b4)
+          #|25|# (q e4 q. f4 q g4 e f4 tie)
+          #|26|# (e f4 q. g4 e gs4 as4 q c5)
+          #|27|# (q. d5 e ds5 fs5 ds5 q d5)
+          #|28|# (e ds5 d5 ds5 q d5 q. ds5 tie)
+          #|29|# (e ds5 ds5 h d5 q ds5)
+          #|30|# (q fs5 g5 a5 as5)
+          #|31|# (e gs5 q. g5 e q. gs5)
+          #|32|# (e as5 h gs5 q as5 e gs5 tie)
+          #|33|# (q gs5 g5 h e5 tie)
+          #|34|# (e e5 q f5 e5 q. f5 tie)
+          #|35|# (h f5 tie e q. b5)
+          #|36|# (q b5 b5 q. cs6 e d6 tie)
+          #|37|# (h. d6)))
+
+(setf mel-2 '(
+          #|1|# (-w)
+          #|2|# (-w)
+          #|3|# (-w)
+          #|4|# (-w)
+          #|5|# (e as5 g5 h as5 tie e e b5 tie)
+          #|6|# (e b5 as5 q g5 e as5 e^s g5as5 -s e fs5 e5)
+          #|7|# (q. d5 q cs5 e b4 cs5 d5)
+          #|8|# (e cs5 h d5 e cs5 d5 cs5 tie)
+          #|9|# (e cs5 q h b4 e cs5 tie)
+          #|10|# (w cs5 tie)
+          #|11|# (w cs5 tie)
+          #|12|# (w cs5 tie)
+          #|13|# (w cs5 tie)
+          #|14|# (q. cs5 e ds6 q. e6 e gs6 tie)
+          #|15|# (q. gs6 e e as6 q b6 e cs7 tie)
+          #|16|# (w cs7 tie)
+          #|17|# (w cs7)
+          #|18|# (e e7 q g7 gs7 e g7 e7 ds7 tie)
+          #|19|# (e ds7 cs7 q. b6 e as6 q b6 tie)
+          #|20|# (e b6 cs7 q b6 h cs7 tie)
+          #|21|# (w cs7)
+          #|22|# (e cs7 h b6 e e as6 gs6 tie)
+          #|23|# (w gs6 tie)
+          #|24|# (q gs6 q. g6 q gs6 e as6 tie)
+          #|25|# (w as6 tie)
+          #|26|# (e as6 h f6 e g6 f6 g6)
+          #|27|# (q. fs6 q ds6 q. tie)
+          #|28|# (e ds6 q d6 d6 e as5 a5 as5 tie)
+          #|29|# (q as5 q. q c6 e as5 tie)
+          #|30|# (e as5 q. c6 e d6 ds6 q fs6)
+          #|31|# (q. e6 e f6 g6 f6 q e6)
+          #|32|# (e f6 s cs6e6 - e f6 q e6 q. f6 tie)
+          #|33|# (e f6 f6 h^s e6f6 -q.. q f6)
+          #|34|# (q g6 q. gs6 as6 tie)
+          #|35|# (w as6 tie)
+          #|36|# (w as6 tie)
+          #|37|# (q. as6)))
+
+(setf mel-3 '(
+          #|1|# (-w)
+          #|2|# (-w)
+          #|3|# (-w)
+          #|4|# (-w)
+          #|5|# (-w)
+          #|6|# (-w)
+          #|7|# (-w)
+          #|8|# (-w)
+          #|9|# (e b2 as2 h. b2 tie)
+          #|10|# (e b2 b2 q as2 e b2 as2 g2 fs2)
+          #|11|# (q. e2 q d2 e cs2 d2 e2)
+          #|12|# (e d2 h e2 e d2 e^s d2e2g2 -s e d2 tie)
+          #|13|# (w d2)
+          #|14|# (q. as2 h b2 tie e)
+          #|15|# (q. ds3 h tie+tie e tie)
+          #|16|# (e ds3 ds3 h. cs3 tie)
+          #|17|# (w cs3)
+          #|18|# (q e3 e ds3 q e3 g3 e as3 tie)
+          #|19|# (h as3 e b3 q cs4 e ds4)
+          #|20|# (e e4 q. g4 as4 e tie)
+          #|21|# (w as4)
+          #|22|# (e g4 q gs4 e as4 b4 gs4 g4 e4 tie)
+          #|23|# (e e4 ds4 q. cs4 e b3 q cs4 tie)
+          #|24|# (e cs4 ds4 h. cs4 tie)
+          #|25|# (q cs4 e f3 g3 q. f3 e g3 tie)
+          #|26|# (h g3 q. f3 e cs3 tie)
+          #|27|# (h cs3 q d3 d3 tie)
+          #|28|# (e d3 d3 q. c3 q d3 e ds3 tie)
+          #|29|# (w ds3 tie)
+          #|30|# (h. ds3 e fs3 g3)
+          #|31|# (q cs3 h. c3 tie)
+          #|32|# (h c3 e gs2 g2 q f2)
+          #|33|# (q f2 q. g2 q gs2 e g2 tie)
+          #|34|# (h g2 e as2 c3 q cs3)
+          #|35|# (q. cs4 e d4 e4 d4 q cs4)
+          #|36|# (e d4 cs4 d4 h cs4 tie+tie e tie)
+          #|37|# (e cs4)))
+
+
+(def-score om-to-p5-and-sc
+    (:title "171119_AlgorhytmicComp 1.1"
+     :composer "Jorgalad"
+     :copyright "Jorgalad 2020"
+     :key-signature 'chromatic
+     :time-signature (get-time-signature mel-1)
+
+     :tempo '(130)
+     :layout (list(bracket-group
+                   (treble-layout 'inst1)
+                   (treble-layout 'inst2)
+                   (bass-layout 'inst3))))
+    (inst1
+     :omn mel-1
+     :channel 2
+     :port "FROM OpusModus I"
+     )
+
+    (inst2
+;     :omn mel-2
+     :omn nil
+     :channel 2 
+     :port "FROM OpusModus I"
+     )
+
+    (inst3
+;     :omn mel-3
+     :omn nil
+     :channel 3 
+     :port "FROM OpusModus I"
+     ))

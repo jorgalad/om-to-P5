@@ -1,12 +1,8 @@
-(progn
 (defparameter P5 '(127.0.0.1 57121))
 (setf thd1 (create-osc-thread "thread1" P5))
-(send-osc-data thd1 '((0.0 1/16) (0.0 1/16) (20 2)
-                      (0.10876829 1/16) (0.12127061 1/8)))
+;(setf thd2 (create-osc-thread "thread2" P5))
 
-(ps 'gm
-    ;:fl (list ost.map5)
-    :cb (list'(
+(setf melody '(      
       (q b2e3g3 mp -h.)
       (q ds3fs3b3 mp -h.)
       (q b2e3g3 mp -h.)
@@ -15,11 +11,57 @@
       (q fs3a3c4 -q h c4e4g4 mp)
       (h b3ds4fs4 b3e4g4 mp)
       (h b2fs3a3ds4 e2e3g3b3 mp)))
-    :key-signature '(e min) 
-    :tempo 200
-    :title "Idea I")
-(setf mel1 (gen-repeat 16 '(e a3 c4 e4 d4)))
+
+(setf lengths (flatten (omn :length melody)))
+
+
+(setf ts-list (get-time-signature melody))
+(setf span (get-span ts-list :sum t))
+;(setf data (gen-osc-data span  '(1 2 3 4) :time 1/1))
+(setf data1 (gen-osc-data span  '(
+                                 7 8 14 12 5 7 8 9 10 11 12 13 14 15 16)
+
+                         :time '(
+                                 2/1 2/1 2/1 2/1 
+                                 1/1 1/1 1/1 1/1
+                                 1/1 1/1 1/1 1/1
+)))
+
+
+
+;(setf data (gen-osc-data span  '(2 4 6 8) :time lengths ))
+
+(progn
+  (def-score osc-test
+             (:key-signature 'chromatic
+              :time-signature '(4 4)
+              :tempo 120
+              :layout (grand-layout 'inst1))
+
+    (inst1
+     :omn melody
+     :channel 1
+     :port "FROM OpusModus I"
+
+))
+
+(send-osc-data thd1 data1)
+;(send-osc-data thd2 data2)
+
+;(audition-last-score)
+(audition-musicxml-last-score)
+  ;(play-midi-last-score) 
+
 
 )
 
-(end-osc-thread thd1)
+;(send-osc-data thd1 data)
+
+
+
+
+
+
+;(send-osc-data thd1 '((0.0 1/1) (0.0 1/1) (20 2)
+;                      (0.10876829 1/16) (0.12127061 1/8)))
+;(end-osc-thread thd1)

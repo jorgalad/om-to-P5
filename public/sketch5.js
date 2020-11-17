@@ -3,29 +3,50 @@
 
 let width = 720;
 let height = 400;
-let x = 0;
-let color = 0;
-let ball;
-let y;
+
+// let bubbles = [100, 25, 46, 72];
+let bubbles = [];
 
 function setup() {
   createCanvas(720, 400);
-  stroke(255);
-  noLoop();
-  y = height; // * 0.5;
   socket = io.connect("http://localhost:3000");
   socket.on("receiveOSC", inMessage);
-  // ball = new Ball();
+  for (let i = 0; i < 10; i++) {
+    let x = random(width);
+    let y = random(height);
+    let r = random(10, 5);
+    bubbles[i] = new Bubble(x, y, r)
+  }
 }
+
 
 function draw() {
   background(0);
-  // y = y - 4;
-  // if (y < 0) {
-  //   y = height;
+  for (let bubble of bubbles) {
+    bubble.show()
+    bubble.move()
+    
+  }
+  // for (let i = 0; i < bubbles.length; i++){
+    // bubbles[i].show()
+    // bubbles[i].move()
   // }
-  // line(0, y, width, y);
+
+  // bubble1.move()
+  // bubble1.show()
 }
+
+function mousePressed() {
+  //Use for testing
+  let r = random(10, 50);
+  let b = new Bubble(mouseX, mouseY, r);
+  // bubbles[0] = b;
+  //Push something to the end of the array
+  bubbles.push(b)
+  
+}
+
+
 
 
 
@@ -51,17 +72,21 @@ function oscToBall(oscValues) {
   //Actual values are not being used yet
   background(0);
   changeColor(oscValues);
-  // redraw();
+  
 }
 
 function changeColor(oscValues) {
-  background(oscValues[0] * 190, oscValues[0] *  120, 90);
+  // background(oscValues[0] * 190, oscValues[0] *  120, 90);
   y = y - 8;
-  // if (y < 0) {
-  //   y = height * oscValues[0];
-  //   console.log(y);
-  // }
-  line(0, y, 200, y);
+  if (y < 0) {
+    y = height;
+  }
+  line(0, y, width, y);
   
   console.log(oscValues[0]);
 }
+
+
+
+
+
