@@ -1,0 +1,38 @@
+(setf bars 16)
+(setf chords '(h d3f3a3 g3bb3e4 f3a3d4 bb3d4f4 f3a3c4 a3c4eb4fs4 bb3d4g4))
+(setf rnd (rnd-order chords :seed 1200))
+
+(setf full (assemble-seq chords rnd))
+
+(setf melodize (pitch-melodize full))
+
+(setf omn1 (make-omn 
+            :pitch (omn :pitch melodize) 
+            :length (gen-repeat bars '(e e e e e e e e ))
+            :articulation '(stacc)))
+
+(setf omn2 (make-omn 
+            :pitch (omn :pitch melodize) 
+            :length (gen-repeat bars '(s s s s s s s s s s s s s s s s ))))
+
+(setf retro (pitch-transpose -12 (gen-retrograde omn2)))
+
+(setf out (merge-voices (pitch-transpose -12 omn1) (pitch-transpose 12 omn2)))
+
+(setf out2 (omn-to-time-signature (harmonic-path '(harmonic-minor) out :type '> :octave :seq) '(4 4)))
+
+(gen-retrograde out2)
+
+
+
+
+(setf line-1 (make-omn
+              :pitch (infinity-series 24 '(c4 cs4 c5))
+              :length (gen-repeat 24 '(3e))
+              :velocity '(mp)))
+(setf line-2 (make-omn
+              :pitch (infinity-series 24 '(c4 b4 c5))
+              :length (gen-repeat 24 '(3e))
+              :velocity '(mp)))
+
+(assemble-seq line-1 line-2 line-1 line-2)

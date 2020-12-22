@@ -48,19 +48,23 @@
                                  1/1 1/1 1/1 1/1
 )))
 
+(setf time-data2 (gen-accumulate (flatten (abs! (omn :length a.1)))))
+
+(gen-mix time-data2 (flatten (omn :length a.1)))
+
+
 (setf data2 (gen-osc-data span  
                           (gen-sine 40 4 1)
-                         :time '(
-                                 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4
-                                 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4
-                                 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4
-                                 1/4 1/4 1/4 1/4 1/4 1/4 1/4 1/4
-                                 1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8
-                                 1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8
-                                 1/8 1/8 1/8 1/8 1/8 1/8 1/8 1/8
-) :loop 't
-))
+                         :time time-data2 :loop 't))
 
+;;Collect Values
+
+
+(setf time-data2 (gen-accumulate (flatten (abs! (omn :length a.1)))))
+
+;;Use these
+;(gen-mix
+;(matrix-transpose
 
 ;(setf data (gen-osc-data span  '(2 4 6 8) :time lengths ))
 
@@ -93,7 +97,6 @@
 (audition-musicxml-last-score)
   ;(play-midi-last-score) 
 )
-
 ;(end-osc-thread thd1)
 ;(end-osc-thread thd2)
 

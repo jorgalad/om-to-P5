@@ -1,0 +1,443 @@
+;;---------------------------------------------------------
+;; Cet exemple OSC est pour Reaktor 6 et l'instrument Drive.ens,
+;; il peut également être adapté à n'importe quel instrument OSC.
+;;---------------------------------------------------------
+;; LOAD INSTRUMENT
+;;---------------------------------------------------------
+;; Si vous placez le fichier Drive.ens dans votre dossier
+;; ~/Opusmodus/Instruments" vous pourrez ouvrir le fichier
+;; à partir de cet emplacement en appelant 
+;; la fonction LOAD-INSTRUMENT:
+
+(load-instrument "Reaktor-Drive.ens")
+
+;;---------------------------------------------------------
+;; OSC Hôte et Port
+;;---------------------------------------------------------
+
+(defparameter *out-socket* (make-socket :type :datagram))
+(defparameter reaktor '(127.0.0.1 10000))
+
+;;---------------------------------------------------------
+;; DATA
+;;---------------------------------------------------------
+(progn
+  (init-seed 6874)
+  (defparameter time1 '(rnd-sample 50 (gen-length '(1 2 3 4 5 6 7 8 9 10 11 12) 1/2)))
+  (defparameter time2 '(1/4 1/2))
+  (defparameter time3 '(rnd-sample 50 time2))
+  (defparameter time4 '(1/32))
+  
+  (defparameter numb1 '(vector-smooth 0.05 (gen-white-noise 1024)))
+  (defparameter numb2 '(gen-sine 128 4 1))
+  
+  (defparameter data  '(gen-osc-data 300 (eval numb1) :time (eval time1)))
+  (defparameter data2 '(gen-osc-data 300 (eval numb1) :min 0.64 :max 0.98 :time (eval time1)))
+  (defparameter data3 '(gen-osc-data 300 (eval numb1) :min 0.64 :max 0.98 :time time4))
+  (defparameter data4 '(gen-osc-data 300 (eval numb1) :time (eval time3)))
+  (defparameter data5 '(gen-osc-data 300 (eval numb2) :time time2))
+  (defparameter data6 '(gen-osc-data 300 (eval numb2) :time time4))
+  (defparameter data7 '(gen-osc-data 300 (eval numb2) :min 0.50 :max 0.88 :time (eval time1)))
+  )
+
+;;---------------------------------------------------------
+;; PARTITION (LIVE CODING INSTRUMENT)
+;;---------------------------------------------------------
+(progn
+  (def-score reaktor-drive
+             (:key-signature 'chromatic
+              :time-signature '(4 4)
+              :tempo 30)
+    (piano
+     :port 0
+     :omn '(10 a2 p)
+     :channel 1
+     :sound 'gm
+     :program 0))
+
+  (live-coding-midi *last-score*)
+  )
+
+;;---------------------------------------------------------
+(progn
+  ;; Boutique - OSC 1
+  (setf osc1-pw (create-osc-thread "osc1-pw" reaktor))
+  (setf osc1-tune (create-osc-thread "osc1-tune" reaktor))
+  (setf osc1-tune-fine (create-osc-thread "osc1-tune-fine" reaktor))
+  (setf osc1-shape (create-osc-thread "osc1-shape" reaktor))
+  (setf osc1-32w (create-osc-thread "osc1-32w" reaktor))
+  (setf osc1-16w (create-osc-thread "osc1-16w" reaktor))
+  (setf osc1-8w (create-osc-thread "osc1-8w" reaktor))
+  (setf osc1-4w (create-osc-thread "osc1-4w" reaktor))
+  (setf osc1-2w (create-osc-thread "osc1-2w" reaktor))
+  (setf osc1-x-m (create-osc-thread "osc1-x-m" reaktor))
+  (setf osc1-32 (create-osc-thread "osc1-32" reaktor))
+  (setf osc1-16 (create-osc-thread "osc1-16" reaktor))
+  (setf osc1-8 (create-osc-thread "osc1-8" reaktor))
+  (setf osc1-4 (create-osc-thread "osc1-4" reaktor))
+  (setf osc1-2 (create-osc-thread "osc1-2" reaktor))
+  (setf osc1-x (create-osc-thread "osc1-x" reaktor))
+  ;; ADSR - OSC 1
+  (setf osc1-adsr-attack (create-osc-thread "osc1-adsr-attack" reaktor))
+  (setf osc1-adsr-attack-m (create-osc-thread "osc1-adsr-attack-m" reaktor))
+  (setf osc1-adsr-decay (create-osc-thread "osc1-adsr-decay" reaktor))
+  (setf osc1-adsr-decay-m (create-osc-thread "osc1-adsr-decay-m" reaktor))
+  (setf osc1-adsr-sustain (create-osc-thread "osc1-adsr-sustain" reaktor))
+  (setf osc1-adsr-release (create-osc-thread "osc1-adsr-release" reaktor))
+  (setf osc1-adsr-release-m (create-osc-thread "osc1-adsr-release-m" reaktor))
+  
+  ;;---------------------------------------------------------
+  ;; Multiwave - OSC 2
+  (setf osc2-pw (create-osc-thread "osc2-pw" reaktor))
+  (setf osc2-tune (create-osc-thread "osc2-tune" reaktor))
+  (setf osc2-tune-fine (create-osc-thread "osc2-tune-fine" reaktor))
+  (setf osc2-pulse (create-osc-thread "osc2-pulse" reaktor))
+  (setf osc2-saw (create-osc-thread "osc2-saw" reaktor))
+  (setf osc2-sub (create-osc-thread "osc2-sub" reaktor))
+  (setf osc2-sub-m (create-osc-thread "osc2-sub-m" reaktor))
+  (setf osc2-nz (create-osc-thread "osc2-nz" reaktor))
+  (setf osc2-nz-m (create-osc-thread "osc2-nz-m" reaktor))
+  ;; ADSR - OSC 2
+  (setf osc2-adsr-attack (create-osc-thread "osc2-adsr-attack" reaktor))
+  (setf osc2-adsr-attack-m (create-osc-thread "osc2-adsr-attack-m" reaktor))
+  (setf osc2-adsr-decay (create-osc-thread "osc2-adsr-decay" reaktor))
+  (setf osc2-adsr-decay-m (create-osc-thread "osc2-adsr-decay-m" reaktor))
+  (setf osc2-adsr-sustain (create-osc-thread "osc2-adsr-sustain" reaktor))
+  (setf osc2-adsr-release (create-osc-thread "osc2-adsr-release" reaktor))
+  (setf osc2-adsr-release-m (create-osc-thread "osc2-adsr-release-m" reaktor))
+  
+  ;;---------------------------------------------------------
+  ;; Monark - OSC 3
+  (setf osc3-freq (create-osc-thread "osc3-freq" reaktor))
+  (setf osc3-fm (create-osc-thread "osc3-fm" reaktor))
+  (setf osc3-kt (create-osc-thread "osc3-kt" reaktor))
+  ;; ADSR - OSC 3
+  (setf osc3-adsr-attack (create-osc-thread "osc3-adsr-attack" reaktor))
+  (setf osc3-adsr-attack-m (create-osc-thread "osc3-adsr-attack-m" reaktor))
+  (setf osc3-adsr-decay (create-osc-thread "osc3-adsr-decay" reaktor))
+  (setf osc3-adsr-decay-m (create-osc-thread "osc3-adsr-decay-m" reaktor))
+  (setf osc3-adsr-sustain (create-osc-thread "osc3-adsr-sustain" reaktor))
+  (setf osc3-adsr-release (create-osc-thread "osc3-adsr-release" reaktor))
+  (setf osc3-adsr-release-m (create-osc-thread "osc3-adsr-release-m" reaktor))
+  
+  ;;---------------------------------------------------------
+  ;; Bento Box - OSC 4
+  (setf osc4-fm (create-osc-thread "osc4-fm" reaktor))
+  (setf osc4-fm-m (create-osc-thread "osc4-fm-m" reaktor))
+  (setf osc4-tune (create-osc-thread "osc4-tune" reaktor))
+  (setf osc4-tune-fine (create-osc-thread "osc4-tune-fine" reaktor))
+  (setf osc4-sync (create-osc-thread "osc4-sync" reaktor))
+  (setf osc4-osc (create-osc-thread "osc4-osc" reaktor))
+  (setf osc4-pw (create-osc-thread "osc4-pw" reaktor))
+  (setf osc4-wave (create-osc-thread "osc4-wave" reaktor))
+  (setf osc4-phase (create-osc-thread "osc4-phase" reaktor))
+  ;; ADSR - OSC 4
+  (setf osc4-adsr-attack (create-osc-thread "osc4-adsr-attack" reaktor))
+  (setf osc4-adsr-attack-m (create-osc-thread "osc4-adsr-attack-m" reaktor))
+  (setf osc4-adsr-decay (create-osc-thread "osc4-adsr-decay" reaktor))
+  (setf osc4-adsr-decay-m (create-osc-thread "osc4-adsr-decay-m" reaktor))
+  (setf osc4-adsr-sustain (create-osc-thread "osc4-adsr-sustain" reaktor))
+  (setf osc4-adsr-release (create-osc-thread "osc4-adsr-release" reaktor))
+  (setf osc4-adsr-release-m (create-osc-thread "osc4-adsr-release-m" reaktor))
+  
+  ;;---------------------------------------------------------
+  ;; Driver
+  (setf dri-res-input (create-osc-thread "dri-res-input" reaktor))
+  (setf dri-res (create-osc-thread "dri-res" reaktor))
+  (setf dri-res-e (create-osc-thread "dri-res-e" reaktor))
+  (setf dri-res-smooth (create-osc-thread "dri-res-smooth" reaktor))
+  (setf dri-res-release (create-osc-thread "dri-res-release" reaktor))
+  (setf dri-freq (create-osc-thread "dri-freq" reaktor))
+  (setf dri-freq-e (create-osc-thread "dri-freq-e" reaktor))
+  (setf dri-freq-p (create-osc-thread "dri-freq-p" reaktor))
+  (setf dri-freq-m (create-osc-thread "dri-freq-m" reaktor))
+  (setf dri-disto (create-osc-thread "dri-disto" reaktor))
+  (setf dri-disto-e (create-osc-thread "dri-disto-e" reaktor))
+  (setf dri-disto-p (create-osc-thread "dri-disto-p" reaktor))
+  (setf dri-disto-m (create-osc-thread "dri-disto-m" reaktor))
+  (setf dri-color (create-osc-thread "dri-color" reaktor))
+  (setf dri-color-lpf (create-osc-thread "dri-color-lpf" reaktor))
+  (setf dri-color-output (create-osc-thread "dri-color-output" reaktor))
+  (setf dri-color-am (create-osc-thread "dri-color-am" reaktor))
+  (setf dri-color-clip-cut (create-osc-thread "dri-color-clip-cut" reaktor))
+  (setf dri-color-lag (create-osc-thread "dri-color-lag" reaktor))
+  ;; ADSR - Driver
+  (setf dri-adsr-attack (create-osc-thread "dri-adsr-attack" reaktor))
+  (setf dri-adsr-attack-m (create-osc-thread "dri-adsr-attack-m" reaktor))
+  (setf dri-adsr-decay (create-osc-thread "dri-adsr-decay" reaktor))
+  (setf dri-adsr-decay-m (create-osc-thread "dri-adsr-decay-m" reaktor))
+  (setf dri-adsr-sustain (create-osc-thread "dri-adsr-sustain" reaktor))
+  (setf dri-adsr-release (create-osc-thread "dri-adsr-release" reaktor))
+  (setf dri-adsr-release-m (create-osc-thread "dri-adsr-release-m" reaktor))
+  
+  ;;---------------------------------------------------------
+  ;; ADSR - Mod
+  (setf mod-adsr-attack (create-osc-thread "mod-adsr-attack" reaktor))
+  (setf mod-adsr-attack-m (create-osc-thread "mod-adsr-attack-m" reaktor))
+  (setf mod-adsr-decay (create-osc-thread "mod-adsr-decay" reaktor))
+  (setf mod-adsr-decay-m (create-osc-thread "mod-adsr-decay-m" reaktor))
+  (setf mod-adsr-sustain (create-osc-thread "mod-adsr-sustain" reaktor))
+  (setf mod-adsr-release (create-osc-thread "mod-adsr-release" reaktor))
+  (setf mod-adsr-release-m (create-osc-thread "mod-adsr-release-m" reaktor))
+  ;; LFO - Mod
+  (setf lfo-freq (create-osc-thread "lfo-freq" reaktor))
+  (setf lfo-phase (create-osc-thread "lfo-phase" reaktor))
+  (setf lfo-shape (create-osc-thread "lfo-shape" reaktor))
+  (setf lfo-wave (create-osc-thread "lfo-wave" reaktor))
+  
+  ;;---------------------------------------------------------
+  ;; ADSR - VCA
+  (setf vca-adsr-attack (create-osc-thread "vca-adsr-attack" reaktor))
+  (setf vca-adsr-attack-m (create-osc-thread "vca-adsr-attack-m" reaktor))
+  (setf vca-adsr-decay (create-osc-thread "vca-adsr-decay" reaktor))
+  (setf vca-adsr-decay-m (create-osc-thread "vca-adsr-decay-m" reaktor))
+  (setf vca-adsr-sustain (create-osc-thread "vca-adsr-sustain" reaktor))
+  (setf vca-adsr-release (create-osc-thread "vca-adsr-release" reaktor))
+  (setf vca-adsr-release-m (create-osc-thread "vca-adsr-release-m" reaktor))
+  
+  ;;---------------------------------------------------------
+  ;; Rounds Delay
+  (setf rd-gra (create-osc-thread "rd-gra" reaktor))
+  (setf rd-pong (create-osc-thread "rd-pong" reaktor))
+  (setf rd-fb (create-osc-thread "rd-fb" reaktor))
+  (setf rd-hp (create-osc-thread "rd-hp" reaktor))
+  (setf rd-lp (create-osc-thread "rd-lp" reaktor))
+  (setf rd-mix (create-osc-thread "rd-mix" reaktor))
+  
+  ;;---------------------------------------------------------
+  ;; Rounds Reverb
+  (setf rr-fb (create-osc-thread "rr-fb" reaktor))
+  (setf rr-diff (create-osc-thread "rr-diff" reaktor))
+  (setf rr-size (create-osc-thread "rr-size" reaktor))
+  (setf rr-spread (create-osc-thread "rr-spread" reaktor))
+  (setf rr-center (create-osc-thread "rr-center" reaktor))
+  (setf rr-hp (create-osc-thread "rr-hp" reaktor))
+  (setf rr-lp (create-osc-thread "rr-lp" reaktor))
+  (setf rr-mix (create-osc-thread "rr-mix" reaktor))
+  
+  ;;---------------------------------------------------------
+  ;; MIX 4 - OSC 1/OSC 2/OSC3/OSC4
+  (setf mix4-1 (create-osc-thread "mix4-1" reaktor))
+  (setf mix4-2 (create-osc-thread "mix4-2" reaktor))
+  (setf mix4-3 (create-osc-thread "mix4-3" reaktor))
+  (setf mix4-4 (create-osc-thread "mix4-4" reaktor))
+  (setf mix4-m (create-osc-thread "mix4-m" reaktor))
+  
+  ;;---------------------------------------------------------
+  ;; CV MIX SC L - OSC4/LFO/VEL/MW
+  (setf cv-mix-l-1 (create-osc-thread "cv-mix-l-1" reaktor))
+  (setf cv-mix-l-2 (create-osc-thread "cv-mix-l-2" reaktor))
+  (setf cv-mix-l-3 (create-osc-thread "cv-mix-l-3" reaktor))
+  (setf cv-mix-l-4 (create-osc-thread "cv-mix-l-4" reaktor))
+  (setf cv-mix-l-5 (create-osc-thread "cv-mix-l-5" reaktor))
+  (setf cv-mix-l-6 (create-osc-thread "cv-mix-l-6" reaktor))
+  (setf cv-mix-l-7 (create-osc-thread "cv-mix-l-7" reaktor))
+  ;; CV MIX SC R - OSC4/LFO/VEL/MW
+  (setf cv-mix-r-1 (create-osc-thread "cv-mix-r-1" reaktor))
+  (setf cv-mix-r-2 (create-osc-thread "cv-mix-r-2" reaktor))
+  (setf cv-mix-r-3 (create-osc-thread "cv-mix-r-3" reaktor))
+  (setf cv-mix-r-4 (create-osc-thread "cv-mix-r-4" reaktor))
+  (setf cv-mix-r-5 (create-osc-thread "cv-mix-r-5" reaktor))
+  (setf cv-mix-r-6 (create-osc-thread "cv-mix-r-6" reaktor))
+  (setf cv-mix-r-7 (create-osc-thread "cv-mix-r-7" reaktor))
+  )
+
+;;---------------------------------------------------------
+;; SEND OSC DATA
+;;---------------------------------------------------------
+;; Boutique - OSC 1
+(send-osc-data osc1-pw (eval data))
+(send-osc-data osc1-tune (eval data))
+(send-osc-data osc1-tune-fine (eval data))
+(send-osc-data osc1-shape (eval data))
+(send-osc-data osc1-32w (eval data))
+(send-osc-data osc1-16w (eval data))
+(send-osc-data osc1-8w (eval data))
+(send-osc-data osc1-4w (eval data))
+(send-osc-data osc1-2w (eval data))
+(send-osc-data osc1-x-m (eval data))
+(send-osc-data osc1-32 (eval data))
+(send-osc-data osc1-16 (eval data))
+(send-osc-data osc1-8 (eval data))
+(send-osc-data osc1-4 (eval data))
+(send-osc-data osc1-2 (eval data))
+(send-osc-data osc1-x (eval data))
+;; ADSR - OSC 1
+(send-osc-data osc1-adsr-attack (eval data))
+(send-osc-data osc1-adsr-attack-m (eval data))
+(send-osc-data osc1-adsr-decay (eval data))
+(send-osc-data osc1-adsr-decay-m (eval data))
+(send-osc-data osc1-adsr-sustain (eval data))
+(send-osc-data osc1-adsr-release (eval data))
+(send-osc-data osc1-adsr-release-m (eval data))
+
+;;---------------------------------------------------------
+;; Multiwave - OSC 2
+(send-osc-data osc2-pw (eval data))
+(send-osc-data osc2-tune (eval data))
+(send-osc-data osc2-tune-fine (eval data))
+(send-osc-data osc2-pulse (eval data))
+(send-osc-data osc2-saw (eval data))
+(send-osc-data osc2-sub (eval data))
+(send-osc-data osc2-sub-m (eval data))
+(send-osc-data osc2-nz (eval data))
+(send-osc-data osc2-nz-m (eval data))
+;; ADSR - OSC 2
+(send-osc-data osc2-adsr-attack (eval data))
+(send-osc-data osc2-adsr-attack-m (eval data))
+(send-osc-data osc2-adsr-decay (eval data))
+(send-osc-data osc2-adsr-decay-m (eval data))
+(send-osc-data osc2-adsr-sustain (eval data))
+(send-osc-data osc2-adsr-release (eval data))
+(send-osc-data osc2-adsr-release-m (eval data))
+
+;;---------------------------------------------------------
+;; Monark - OSC 3
+(send-osc-data osc3-freq (eval data))
+(send-osc-data osc3-fm (eval data))
+(send-osc-data osc3-kt (eval data))
+;; ADSR - OSC 3
+(send-osc-data osc3-adsr-attack (eval data))
+(send-osc-data osc3-adsr-attack-m (eval data))
+(send-osc-data osc3-adsr-decay (eval data))
+(send-osc-data osc3-adsr-decay-m (eval data))
+(send-osc-data osc3-adsr-sustain (eval data))
+(send-osc-data osc3-adsr-release (eval data))
+(send-osc-data osc3-adsr-release-m (eval data))
+
+;;---------------------------------------------------------
+;; Bento Box - OSC 4
+(send-osc-data osc4-fm (eval data))
+(send-osc-data osc4-fm-m (eval data))
+(send-osc-data osc4-tune (eval data))
+(send-osc-data osc4-tune-fine (eval data))
+(send-osc-data osc4-sync (eval data))
+(send-osc-data osc4-osc (eval data))
+(send-osc-data osc4-pw (eval data))
+(send-osc-data osc4-wave (eval data))
+(send-osc-data osc4-phase (eval data))
+;; ADSR - OSC 4
+(send-osc-data osc4-adsr-attack (eval data))
+(send-osc-data osc4-adsr-attack-m (eval data))
+(send-osc-data osc4-adsr-decay (eval data))
+(send-osc-data osc4-adsr-decay-m (eval data))
+(send-osc-data osc4-adsr-sustain (eval data))
+(send-osc-data osc4-adsr-release (eval data))
+(send-osc-data osc4-adsr-release-m (eval data))
+
+;;---------------------------------------------------------
+;; Driver
+(send-osc-data dri-res-input (eval data))
+(send-osc-data dri-res (eval data))
+(send-osc-data dri-res-e (eval data))
+(send-osc-data dri-res-smooth (eval data))
+(send-osc-data dri-res-release (eval data))
+(send-osc-data dri-freq (eval data))
+(send-osc-data dri-freq-e (eval data))
+(send-osc-data dri-freq-p (eval data))
+(send-osc-data dri-freq-m (eval data))
+(send-osc-data dri-disto (eval data))
+(send-osc-data dri-disto-e (eval data))
+(send-osc-data dri-disto-p (eval data))
+(send-osc-data dri-disto-m (eval data))
+(send-osc-data dri-color (eval data))
+(send-osc-data dri-color-lpf (eval data))
+(send-osc-data dri-color-output (eval data))
+(send-osc-data dri-color-am (eval data))
+(send-osc-data dri-color-clip-cut (eval data))
+(send-osc-data dri-color-lag (eval data))
+;; ADSR - Driver
+(send-osc-data dri-adsr-attack (eval data))
+(send-osc-data dri-adsr-attack-m (eval data))
+(send-osc-data dri-adsr-decay (eval data))
+(send-osc-data dri-adsr-decay-m (eval data))
+(send-osc-data dri-adsr-sustain (eval data))
+(send-osc-data dri-adsr-release (eval data))
+(send-osc-data dri-adsr-release-m (eval data))
+
+;;---------------------------------------------------------
+;; ADSR - Mod
+(send-osc-data mod-adsr-attack (eval data))
+(send-osc-data mod-adsr-attack-m (eval data))
+(send-osc-data mod-adsr-decay (eval data))
+(send-osc-data mod-adsr-decay-m (eval data))
+(send-osc-data mod-adsr-sustain (eval data))
+(send-osc-data mod-adsr-release (eval data))
+(send-osc-data mod-adsr-release-m (eval data))
+;; LFO - Mod
+(send-osc-data lfo-freq (eval data))
+(send-osc-data lfo-phase (eval data))
+(send-osc-data lfo-shape (eval data))
+(send-osc-data lfo-wave (eval data))
+
+;;---------------------------------------------------------
+;; ADSR - VCA
+(send-osc-data vca-adsr-attack (eval data))
+(send-osc-data vca-adsr-attack-m (eval data))
+(send-osc-data vca-adsr-decay (eval data))
+(send-osc-data vca-adsr-decay-m (eval data))
+(send-osc-data vca-adsr-sustain (eval data))
+(send-osc-data vca-adsr-release (eval data))
+(send-osc-data vca-adsr-release-m (eval data))
+
+;;---------------------------------------------------------
+;; Rounds Delay
+(send-osc-data rd-gra (eval data))
+(send-osc-data rd-pong (eval data))
+(send-osc-data rd-fb (eval data))
+(send-osc-data rd-hp (eval data))
+(send-osc-data rd-lp (eval data))
+;(send-osc-data rd-mix (eval data))
+
+;;---------------------------------------------------------
+;; Rounds Reverb
+(send-osc-data rr-fb (eval data))
+(send-osc-data rr-diff (eval data))
+(send-osc-data rr-size (eval data))
+(send-osc-data rr-spread (eval data))
+(send-osc-data rr-center (eval data))
+(send-osc-data rr-hp (eval data))
+(send-osc-data rr-lp (eval data))
+(send-osc-data rr-mix (eval data))
+
+;;---------------------------------------------------------
+;; MIX 4 - OSC 1/OSC 2/OSC3/OSC4
+(send-osc-data mix4-1 (eval data))
+(send-osc-data mix4-2 (eval data))
+(send-osc-data mix4-3 (eval data))
+(send-osc-data mix4-4 (eval data))
+(send-osc-data mix4-m (eval data))
+
+;;---------------------------------------------------------
+;; CV MIX SC L - OSC4/LFO/VEL/MW
+(send-osc-data cv-mix-l-1 (eval data))
+(send-osc-data cv-mix-l-2 (eval data))
+(send-osc-data cv-mix-l-3 (eval data))
+(send-osc-data cv-mix-l-4 (eval data))
+(send-osc-data cv-mix-l-5 (eval data))
+(send-osc-data cv-mix-l-6 (eval data))
+(send-osc-data cv-mix-l-7 (eval data))
+;; CV MIX SC R - OSC4/LFO/VEL/MW
+(send-osc-data cv-mix-r-1 (eval data))
+(send-osc-data cv-mix-r-2 (eval data))
+(send-osc-data cv-mix-r-3 (eval data))
+(send-osc-data cv-mix-r-4 (eval data))
+(send-osc-data cv-mix-r-5 (eval data))
+(send-osc-data cv-mix-r-6 (eval data))
+(send-osc-data cv-mix-r-7 (eval data))
+
+;;---------------------------------------------------------
+;; RESET INIT-SEED
+;;---------------------------------------------------------
+(init-seed nil)
+
+#!
+;;---------------------------------------------------------
+;; FIN DES THREADS
+;;---------------------------------------------------------
+;; Termine tous les threads
+(end-all-osc-threads)
+
+;; Termine un thread donné
+(end-osc-thread osc1-pw)
+!#

@@ -1,24 +1,98 @@
+;;; ===================== L-Systems =====================
+(defclass exp3 (l-system)
+  ((axiom :initform '(c4 b3 ab3 bb3 a3 ab4))
+   (depth :initform 3)))
+
+(defmethod l-productions ((ls exp3))
+  (choose-production ls
+                     (c4  (--> - - b3))
+                     (b3  (--> ab3 + bb3))
+                     (ab3 (--> bb3 a3))
+                     (bb3 (--> a3 gb3 c4))
+                     (a3  (--> gb3 c4 + - +))
+                     (ab4 (--> gb3 - + b3))))
+
+(setf mel1 (pitch-lsystem 'exp3 :depth 5))
+
+(setf len1 (gen-length-cartesian 2 1 'd 'c 8 '(8 16) '(12 8) '(1 2 3 4 5 6) :seed 1200))
+(setf mel1.1 (make-omn :pitch mel1 :length len1))
+
+(setf ins1.1 (harmonic-path '(harmonic-minor) mel1.1))
+(setf ins1.2 '((-q c5 h d5) (e g5 f5 eb5 d5 q c5 b4)))
 
 
+(setf line1 (assemble-seq ins1.1 ins1.2))
+;;; Line 2
+;Melodic Motiv
+(setf motiv (mapcar 'flatten (cartesian '((e q) ((c4 d4) (eb4 f4) (c4 cs5))))))
+(setf motiv-replace (omn-replace :length '(q h) motiv :section '(5)))
+(setf motiv-add '(h c5 -e e c5 eb5  gs4 h g4))
+(setf motiv2 (flatten (assemble-seq motiv-replace motiv-add)))
+(setf motiv3 (omn-to-time-signature motiv2 '(4 4)))
 
 
-(setf mel1 (gen-repeat 8 '(
-                           (q c3 e f3 g3 gs3 g3 q. eb3)
-                           (e c3 e f3 g3 gs3 q. g3 q eb3 e d3 eb3 q c3)
-                           (q eb3 e d3 eb3 h c3))))
+(setf line2 (assemble-seq motiv3))
 
-(setf ts-list (get-time-signature mel1))
+
+;;TEMP
+;Line 1
+(setf l1 (flatten '((e c3 3e d3 - eb3 e f3 3e g3 - gs3 e b3 c3 d3 eb3) (e c3 d3 eb3 f3 g3 gs3 b2 c2))))
+;Line 2
+(setf l2 (flatten '((e c4 d4 eb4 f4 c4 cs5 q c4) (q d4 eb4 f4 c4) (h cs5 c5) (-e c 5 eb5 gs4 h g4))))
+
+
 
 (def-score filterExample
              (:title "Filter Modulate"
               :composer "Jorgalad"
               :key-signature '(d min)
-              :time-signature ts-list
-              :tempo 20
-              :layout (grand-layout 'inst1))
+              :time-signature '(4 4)
+              :tempo 60
+              :layout (list 
+                       (bracket-group
+                        (treble-layout 'inst1)
+                        (bass-layout 'inst2))))
+(inst1
+ :omn line1
+ :channel 1
+ :port "FROM OpusModus I"
+)
+(inst2
+ :omn line2
+ :channel 1
+ :port "FROM OpusModus I"
+)
+)
 
-    (inst1
-     :omn mel1
-     :channel 4
-     :port "FROM OpusModus I"
-     ))
+(pprint-last-score)
+
+#|
+
+(def-score filterexample
+         (:title "Filter Modulate"
+          :composer "Jorgalad"
+          :copyright nil
+          :key-signature '(d min)
+          :layout '((:bracket (:treble inst1) (:bass inst2)))
+          :rewrite-lengths 't
+          :time-signature '(4 4)
+          :tempo '60)
+       (inst1
+        :omn '(#|1|# (e c3 3e d3 - eb3 e f3 3e g3 - gs3 e b3 c3 d3 eb3)
+               #|2|# (e c3 d3 eb3 f3 g3 gs3 b2 c2)
+               #|3|# (-q c5 h d5)
+               #|4|# (e g5 f5 eb5 d5 q c5 b4))
+        :port "FROM OpusModus I"
+        :channel 1
+        :volume 90
+        :pan 64)
+       (inst2
+        :omn '(#|1|# (e c4 d4 eb4 f4 c4 cs5 q c4)
+               #|2|# (q d4 eb4 f4 c4)
+               #|3|# (h cs5 c5)
+               #|4|# (-e c5 eb5 gs4 h g4))
+        :port "FROM OpusModus I"
+        :channel 1
+        :volume 90
+        :pan 64))
+|#

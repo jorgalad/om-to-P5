@@ -3,7 +3,6 @@
 
 let width = 720;
 let height = 400;
-
 let x = 0;
 let color = 0;
 let y;
@@ -29,7 +28,6 @@ function draw() {
 
 function inMessage(oscMessage) {
   if (Object.values(oscMessage).indexOf(`/thread1`) > -1) {
-    // console.log(`This is thread 1`)
     for (let i of Object.keys(oscMessage)) {
       let t1 = oscMessage[i];
       thread_1(t1);
@@ -39,7 +37,6 @@ function inMessage(oscMessage) {
   }  
 
   if (Object.values(oscMessage).indexOf(`/thread2`) > -1) {
-    // console.log(`This is thread 2`)
     for (let i of Object.keys(oscMessage)) {
       let t2 = oscMessage[i]
       // console.log(`Thread 2 Value: ${thread2}`)

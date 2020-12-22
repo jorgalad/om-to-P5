@@ -1,0 +1,6 @@
+(setf chords '(h d3f3a3 g3bb3e4 f3a3d4 bb3d4f4 f3a3c4 a3c4eb4fs4 bb3d4g4))
+;; Split into multiple voices
+
+(setf split (gen-divide 1 chords))
+
+(setf mel1.1 (integer-to-pitch (1~ (array-to-list split))))

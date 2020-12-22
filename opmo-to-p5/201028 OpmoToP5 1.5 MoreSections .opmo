@@ -1,0 +1,130 @@
+;;; ============= REAL SCORE =============
+;;; ============= SECTION 1 =============
+(setf size 16)
+(setf line1.1 '(
+                ;(e c3 3e d3 - eb3 e f3 3e g3 - gs3 e b3 c3 d3 eb3)
+                ;(e c3 d3 eb3 f3 g3 gs3 b2 c2)
+                (-q c5 h d5)
+                (e g5 f5 eb5 d5 q c5 b4)
+                (q.. c5 t d5 eb5 q. d5 e f5)
+                (q g5 e f5 q. b5 q gs5)
+                (q.. c5 t d5 eb5 q. d5 e eb5)
+                (q d5 e b4 q. f5 q b4)
+                (-w)
+                (-w)
+                (-w)
+                (-w)
+                (q b4 c5 h d5)
+                (e g5 f5 eb5 d5 q c5 b4)
+                (q.. c5 t d5 eb5 q. d5 e f5)
+                (q g5 e f5 q. b5 q gs5)
+                (q.. b4 t d5 eb5 q. d5 e eb5)
+                (q d5 e b4 q. db5 q c5)))
+
+(setf line2.1 '(
+                ;(e c4 d4 eb4 f4 c4 cs5 q c4)
+                ;(q d4 eb4 f4 c4)
+                (h cs5 c5)
+                (-e c5 eb5 gs4 h g4)
+                (q g3 g3 g3 g3)
+                (q g3 g3 g3 g3)
+                (q f3 f3 f3 f3)
+                (q f3 eb3 f3 g3)
+
+                (q g3 mp g3 > g3  p g3)
+                (q g3 mp g3 < g3 mf g3)
+                (q f3 mp f3 > f3 pp f3)
+                (q f3 mp eb3 < f3 f g3)))
+
+;;; ============= CHORDS =============
+
+(setf line3.1 (harmonic-progression 
+               (rnd-number (length line1.1) 0 7 :seed 1200)
+               line2.1
+               :size 2
+               :row 't
+               :root -12))
+
+(setf line3.2 (make-omn
+             :length (gen-repeat (* size 4) '(1/4))
+             :pitch (pitch-transpose -12 line3.1)
+             :velocity '(pp p)))
+
+;;; ============= SECTION 2 =============
+
+(setf bars 16)
+(setf chords '(h d3f3a3 g3bb3e4 f3a3d4 bb3d4f4 f3a3c4 a3c4eb4fs4 bb3d4g4))
+(setf rnd (rnd-order chords :seed 1200))
+
+(setf full (assemble-seq chords rnd))
+
+(setf melodize (pitch-melodize full))
+
+(setf omn1 (make-omn 
+            :pitch (omn :pitch melodize) 
+            :length (gen-repeat bars '(e e e e e e e e ))
+            :articulation '(stacc)))
+
+(setf omn2 (make-omn 
+            :pitch (omn :pitch melodize) 
+            :length (gen-repeat bars '(s s s s s s s s s s s s s s s s ))))
+
+(setf retro (pitch-transpose -12 (gen-retrograde omn2)))
+
+(setf B-1 (omn-to-time-signature 
+           (harmonic-path '(harmonic-minor)
+                          (pitch-transpose -12 omn1)
+           :type '> :octave :seq) '(4 4)))
+
+(setf B-2 (omn-to-time-signature 
+           (harmonic-path '(harmonic-minor)
+                          (pitch-transpose 12 omn2)
+           :type '> :octave :seq) '(4 4)))
+
+(setf B-1.1 (gen-retrograde B-1))
+(setf B-2.1 (gen-retrograde B-2))
+(setf B-3 (gen-repeat (length B-2.1) '(-w)))
+
+
+
+;;; ============= ASSEMBLE =============
+
+(setf line1 (assemble-seq line1.1)); B-1.1))
+(setf line2 (assemble-seq line2.1)); B-2.1))
+(setf line3 (assemble-seq line3.2)); B-3))
+
+;(setf line1 (assemble-seq B-1.1))
+;(setf line2 (assemble-seq B-2.1))
+;(setf line3 (assemble-seq B-3))
+
+
+(def-score filterExample
+             (:title "Filter Modulate"
+              :composer "Jorgalad"
+              :key-signature '(d min)
+              :time-signature '(4 4)
+              :tempo 60
+              :layout (list 
+                       (bracket-group
+                        (treble-layout 'inst1)
+                        (bass-layout 'inst2)
+                        (bass-layout 'inst3)
+)))
+(inst1
+ :omn line1
+ :channel 1
+ :port "FROM OpusModus I"
+)
+(inst2
+ :omn line2
+ :channel 1
+ :port "FROM OpusModus I"
+)
+(inst3
+ :omn line3
+ :channel 1
+ :port "FROM OpusModus I"
+)
+)
+
+(pprint-last-score)

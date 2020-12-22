@@ -1,0 +1,91 @@
+;;; ============= REAL SCORE =============
+;;; ============= SECTION 1 =============
+(setf size 16)
+(setf line1.1 '(
+                ;(e c3 3e d3 - eb3 e f3 3e g3 - gs3 e b3 c3 d3 eb3)
+                ;(e c3 d3 eb3 f3 g3 gs3 b2 c2)
+                (-q c5 h d5)
+                (e g5 f5 eb5 d5 q c5 b4)
+                (w c5)))
+
+(setf line2.1 '(
+                (h cs5 c5)
+                (-e c5 eb5 gs4 h g4)
+                (w g2)))
+
+
+;;; ============= CHORDS =============
+
+(setf line3.1 (harmonic-progression 
+               (rnd-number (length line1.1) 0 7 :seed 1200)
+               line2.1
+               :size 2
+               :row 't
+               :root -12))
+
+(setf line3.2 (make-omn
+             :length (gen-repeat 9 '(1/4))
+             :pitch (pitch-transpose -12 line3.1)
+             :velocity '(pp p)))
+
+
+
+
+
+;;; ============= ASSEMBLE =============
+
+(setf line1 (assemble-seq line1.1)); B-1.1))
+(setf line2 (assemble-seq line2.1)); B-2.1))
+(setf line3 (assemble-seq line3.2)); B-3))
+
+(setf ts-list (get-time-signature line1))
+(setf span (get-span ts-list :sum t))
+
+;;; ========= OSC =========
+(defparameter P5 '(127.0.0.1 57121))
+(setf thd1 (create-osc-thread "thread1" P5))
+;(setf thd2 (create-osc-thread "thread2" P5))
+(setf data1 (gen-osc-data span  '(
+                                 7 8 14 12 5 7 8 9 10 11 12 13 14 15 16)
+
+                         :time '(
+                                 1/1 1/1 1/1 1/1 
+                                 1/2 1/2 1/2 1/2
+                                 1/1
+                                 
+)))
+
+
+(progn
+(def-score filterExample
+             (:title "Filter Modulate"
+              :composer "Jorgalad"
+              :key-signature '(d min)
+              :time-signature '(4 4)
+              :tempo 60
+              :layout (list 
+                       (bracket-group
+                        (treble-layout 'inst1)
+                        (bass-layout 'inst2)
+                        (bass-layout 'inst3)
+)))
+(inst1
+ :omn line1
+ :channel 1
+ :port "FROM OpusModus I")
+
+(inst2
+ :omn line2
+ :channel 1
+ :port "FROM OpusModus I")
+
+(inst3
+ :omn line3
+ :channel 1
+ :port "FROM OpusModus I"))
+
+;(send-osc-data thd1 data1))
+
+;(end-osc-thread thd1)
+
+;(pprint-last-score)

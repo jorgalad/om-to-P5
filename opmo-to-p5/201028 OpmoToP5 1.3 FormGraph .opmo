@@ -1,0 +1,177 @@
+;;; ============= EXPERIMENTS =============
+
+
+(setf startSet (gen-mandelbrot 4 32 16 :left -1.5 :top -1.5 :right -0.8 :bottom 0.76))
+(list-plot
+ (array-to-list startset)
+ :join-points t :point-radius 1 :style :axis)
+
+;Unpack the Array, 4 instruments, 16 notes
+(setf all-1.1 (integer-to-pitch (array-to-list startSet)))
+(setf mel1.1 (integer-to-pitch (1~ (array-to-list startSet))))
+(setf mel2.1 (integer-to-pitch (2~ (array-to-list startSet))))
+(setf mel3.1 (integer-to-pitch (3~ (array-to-list startSet))))
+(setf mel4.1 (integer-to-pitch (4~ (array-to-list startSet))))
+
+(setf mel1.2 (make-omn :length (gen-repeat (length mel1.1) '(e)) :pitch (pitch-transpose 12 mel1.1)))
+(setf mel2.2 (make-omn :length (gen-repeat (length mel2.1) '(e)) :pitch (pitch-transpose -12 mel2.1)))
+(setf mel3.2 (make-omn :length (gen-repeat (length mel3.1) '(e)) :pitch mel3.1))
+(setf mel4.2 (make-omn :length (gen-repeat (length mel4.1) '(e)) :pitch (pitch-transpose -24 mel4.1)))
+
+(setf mel1.3 (omn-to-time-signature (harmonic-path '(harmonic-minor) mel1.2 :type '< :octave :seq) '(4 4)))
+(setf mel2.3 (omn-to-time-signature (harmonic-path '(harmonic-minor) mel2.2 :type '< :octave :seq) '(4 4)))
+(setf mel3.3 (omn-to-time-signature (harmonic-path '(harmonic-minor) mel3.2 :type '< :octave :seq) '(4 4)))
+(setf mel4.3 (omn-to-time-signature (harmonic-path '(harmonic-minor) mel4.2 :type '> :octave :seq) '(4 4)))
+
+
+;Try single line
+(make-omn :pitch (gen-chord2 16 4 all-1.1 :offset 4 :transpose 12 ) :length (gen-repeat 16 'e))
+
+(progn 
+(setf
+ mel1 mel1.3
+ mel2 mel2.3
+ mel3 mel3.3
+ mel4 mel4.3
+)
+
+(do-timeline
+ '( 
+   mel1    (-xx-)
+   mel2    (---x)
+   mel3    (x---)
+   mel4    (xxx-)
+   )
+ '(gen-pause x))
+)
+#|
+(ps 'gm
+    :fl (list mel1)
+    :ob (list mel2)
+    :cl (list mel3)
+    :bn (list mel4))
+|#
+
+;;; ============= REAL SCORE =============
+(setf size 16)
+(setf line1.1 '(
+                ;(e c3 3e d3 - eb3 e f3 3e g3 - gs3 e b3 c3 d3 eb3)
+                ;(e c3 d3 eb3 f3 g3 gs3 b2 c2)
+                (-q c5 h d5)
+                (e g5 f5 eb5 d5 q c5 b4)
+                (q.. c5 t d5 eb5 q. d5 e f5)
+                (q g5 e f5 q. b5 q gs5)
+                (q.. c5 t d5 eb5 q. d5 e eb5)
+                (q d5 e b4 q. f5 q b4)
+                (-w)            
+                (-w)
+                (-w)
+                (-w)
+                (q b4 c5 h d5)
+                (e g5 f5 eb5 d5 q c5 b4)
+                (q.. c5 t d5 eb5 q. d5 e f5)
+                (q g5 e f5 q. b5 q gs5)
+                (q.. b4 t d5 eb5 q. d5 e eb5)
+                (q d5 e b4 q. db5 q c5)
+))
+
+(setf line2.1 '(
+                ;(e c4 d4 eb4 f4 c4 cs5 q c4)
+                ;(q d4 eb4 f4 c4)
+                (h cs5 c5)
+                (-e c5 eb5 gs4 h g4)
+                (q g3 g3 g3 g3)
+                (q g3 g3 g3 g3)
+                (q f3 f3 f3 f3)
+                (q f3 eb3 f3 g3)
+
+                (q g3 mp g3 > g3  p g3)
+                (q g3 mp g3 < g3 mf g3)
+                (q f3 mp f3 > f3 pp f3)
+                (q f3 mp eb3 < f3 f g3)
+))
+
+;;; ============= CHORDS =============
+
+(setf line3.1 (harmonic-progression 
+               (rnd-number (length line1.1) 0 7 :seed 1200)
+               line2.1
+               :size 2
+               :row 't
+               :root -12
+))
+(setf line3.2 (make-omn
+             :length (gen-repeat (* size 4) '(1/4))
+             :pitch (pitch-transpose -12 line3.1)
+             :velocity '(pp p)
+))
+
+
+;;; ============= ASSEMBLE =============
+(setf line1 (assemble-seq line1.1))
+(setf line2 (assemble-seq line2.1))
+(setf line3 (assemble-seq line3.2))
+
+
+(def-score filterExample
+             (:title "Filter Modulate"
+              :composer "Jorgalad"
+              :key-signature '(d min)
+              :time-signature '(4 4)
+              :tempo 60
+              :layout (list 
+                       (bracket-group
+                        (treble-layout 'inst1)
+                        (bass-layout 'inst2)
+                        (bass-layout 'inst3)
+)))
+(inst1
+ :omn line1
+ :channel 1
+ :port "FROM OpusModus I"
+)
+(inst2
+ :omn line2
+ :channel 1
+ :port "FROM OpusModus I"
+)
+(inst3
+ :omn line3
+ :channel 1
+ :port "FROM OpusModus I"
+)
+
+)
+
+(pprint-last-score)
+
+#|
+
+(def-score filterexample
+         (:title "Filter Modulate"
+          :composer "Jorgalad"
+          :copyright nil
+          :key-signature '(d min)
+          :layout '((:bracket (:treble inst1) (:bass inst2)))
+          :rewrite-lengths 't
+          :time-signature '(4 4)
+          :tempo '60)
+       (inst1
+        :omn '(#|1|# (e c3 3e d3 - eb3 e f3 3e g3 - gs3 e b3 c3 d3 eb3)
+               #|2|# (e c3 d3 eb3 f3 g3 gs3 b2 c2)
+               #|3|# (-q c5 h d5)
+               #|4|# (e g5 f5 eb5 d5 q c5 b4))
+        :port "FROM OpusModus I"
+        :channel 1
+        :volume 90
+        :pan 64)
+       (inst2
+        :omn '(#|1|# (e c4 d4 eb4 f4 c4 cs5 q c4)
+               #|2|# (q d4 eb4 f4 c4)
+               #|3|# (h cs5 c5)
+               #|4|# (-e c5 eb5 gs4 h g4))
+        :port "FROM OpusModus I"
+        :channel 1
+        :volume 90
+        :pan 64))
+|#
