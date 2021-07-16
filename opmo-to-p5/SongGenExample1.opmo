@@ -1,0 +1,87 @@
+(setf size 24)
+
+(setf degree (rnd-number size 1 7))
+
+(setf main-tonality '(d4 dorian))
+(setf prog.chords (closest-path
+                   (harmonic-progression
+                    degree
+                    main-tonality
+                    :size 4
+                    :base 1)
+                   ))
+
+
+(setf prog.scales 
+                   (harmonic-progression
+                    degree
+                    main-tonality
+                    :size 7
+                    :base 1)
+                   )
+
+
+
+;;; Melody generation
+;; From vector
+(setf  vect1 (vector-smooth 0.12 (gen-white-noise 128)))
+(setf mel.pitch (vector-to-pitch '(g4 g6) vect1))
+(setf mel.ry.reservoir '((h h)(s s s s q e e q)(h. -q)(e e e e q -q)))
+(setf mel.ry (rnd-sample size mel.ry.reservoir :encode nil))
+(setf mel.vel '((p)))
+
+(def-case artic
+((h h) '(def def))
+((s s s s q e e q) '(leg leg leg def def leg def def))
+((h. -q) '(def))
+((e e e e q -q) '(leg def def def def))
+(otherwise '(def)))
+
+(setf mel.art (artic mel.ry))
+
+;;;; OMN assy
+(setf melo (make-omn
+            :pitch mel.pitch
+            :length mel.ry
+            :velocity mel.vel
+            :articulation mel.art
+            ))
+
+
+;;; Accomp.
+;; Arpegio
+(setf arp1 (gen-repeat size '((s c3 p stacc e3   g3   c4  
+                                 e4  g4  c5  e5  
+                                 g5  e5  c5  g4 
+                                 e4  c4  g3  e3 ))))
+
+
+
+(setf chords (gen-repeat size '((h c3g3e4c5 p def =))))
+
+(setf bass (gen-repeat size '((q c2 p stacc stacc stacc stacc ))))
+
+
+;;; Now the mapping
+
+(setf mel.map (filter-tie (tonality-map (mclist prog.scales) melo)))
+
+(setf arp1.map (harmonic-path (mclist prog.chords) arp1))
+(setf chords.map (harmonic-path (mclist prog.chords) chords))
+(setf bass.map (harmonic-path (mclist prog.chords) bass))
+
+;; Do-timeline ?
+
+
+
+(ps 'vsl 
+    :fl (list mel.map)
+    :strings1 (list arp1.map)
+    :strings2 (list chords.map)
+    :woods1 (list arp1.map)
+    :strings3 (list bass.map)
+)
+
+
+
+

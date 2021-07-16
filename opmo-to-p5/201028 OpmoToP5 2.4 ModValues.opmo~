@@ -1,0 +1,205 @@
+(init-seed 12)
+#|
+Close Specific Port:
+sudo lsof -i :57121
+//List all UDP and TCP ports
+listports
+netstat -anvp tcp | awk 'NR<3 || /LISTEN/'
+sudo lsof -PiTCP -sTCP:LISTEN
+|#
+(setf size 24)
+(setf main-tonality '(c3 harmonic-minor))
+(setf prog.chords '(c3g3c4ds4 f3gs3c4f4 ds3as3ds4g4 g3as3d4g4
+             gs2gs3c4ds4 as2f3as3d4 c3g3c4ds4 d3fs3a3d4
+             gs2ds3gs3c4 ds2ds3g3as3 f2c3gs3f4 c3g3c4ds4
+             fs3a3c4ds4 gs2fs3c4d4 g2g3c4ds4 g2g3b3d4
+             f2g3gs3ds4 d3gs3b3f4 f3gs3ds4g4 d3gs3b3f4
+             gs2gs3c4ds4 as2f3d4as4 ds3g3ds4as4 gs2gs3ds4c5
+             as2f3as3d5 ds3g3as3ds5 gs2f3d4f4 gs2f3as3d4
+             gs2fs3c4d4 g2g3b3d4 c3g3c4ds4 d3fs3a3d4
+             gs2gs3c4ds4 gs2b3d4f4 fs2a3c4ds4 g2g3c4ds4 g2g3b3d4 c3ds3g3ds4))
+(setf degree (rnd-number size 1 7))
+(setf main-tonality '(c3 harmonic-minor))
+(setf prog.chords (closest-path
+                   (harmonic-progression
+                    degree
+                    main-tonality
+                    :size 4
+                    :base 1)
+                   ))
+(setf prog.scales 
+                   (harmonic-progression
+                    degree
+                    main-tonality
+                    :size 7
+                    :base 1)
+                   )
+;;; Melody generation
+;; From vector
+(setf  vect1 (vector-smooth 0.12 (gen-white-noise 128)))
+(setf mel.pitch (vector-to-pitch '(c5 g6) vect1))
+(setf mel.ry.reservoir '((h h)(s s s s q e e q)(h. -q)(e e e e q -q)))
+;(setf mel.ry.reservoir '((s s s s q e e q)(e e e e q -q)))
+(setf mel.ry (rnd-sample size mel.ry.reservoir :encode nil :seed 500))
+(setf mel.vel '((p)))
+(def-case artic
+((h h) '(def def))
+((s s s s q e e q) '(leg leg leg def def leg def def))
+((h. -q) '(def))
+((e e e e q -q) '(leg def def def def))
+(otherwise '(def)))
+(setf mel.art (artic mel.ry))
+;;;; OMN assy
+(setf melo (make-omn
+            :pitch mel.pitch
+            :length mel.ry
+            :velocity mel.vel
+            :articulation mel.art
+            ))
+;;; Accomp.
+;; Arpegio
+(setf mat '(e c3 p stacc e3 g3 c4 e4 g4 c5 e5 g5 e5 c5 g4 e4 c4 g3 e3))
+(setf arp1 (gen-repeat size (list mat)))
+(setf chords (gen-repeat size '((h c3g3e4c5 p def =))))
+(setf bass (gen-repeat size '((q c2 p stacc stacc stacc stacc))))
+;;; Now the mapping
+;; First get tonality form
+;(setf mel.map (filter-tie (tonality-map (mclist prog.scales) melo)))
+(setf mel.map (pitch-transpose 0 (filter-tie (tonality-map (mclist prog.chords) melo))))
+(setf arp1.map (harmonic-path (mclist prog.chords) arp1))
+(setf chords.map (harmonic-path (mclist prog.chords) chords :octave 'path))
+
+(setf bass.map (harmonic-path (mclist prog.chords) bass))
+;;; Assemble
+(setf instr-A (assemble-seq (ambitus '(g3 c5) mel.map)))
+(setf instr-B (assemble-seq arp1.map))
+(setf instr-C (assemble-seq (pitch-transpose 0 chords.map)))
+;(setf instr-C (assemble-seq prog.chords))
+(setf instr-D (assemble-seq bass.map))
+;; Do-timeline ?
+(do-timeline
+ '(
+   instr-A (---- ---- ---- ---- ---- ---- ----)
+   instr-B (---- ---- ---- ---- ---- ---- ----) ;;SC Foley
+   instr-C (xxxx ---- ---- ---- ---- --xx ----)   
+   instr-D (xxxx xxxx ---- ---- ---- xxxx ----)
+   )
+ '(gen-pause x))
+
+(setf ts-list (get-time-signature instr-A))
+(setf span (get-span ts-list :sum t))
+;;; ====================== OSC ======================
+(defparameter P5 '(127.0.0.1 57121))
+(defparameter SC '(127.0.0.1 57120))
+;(defparameter SC '(127.0.0.1 8000))
+(setf thd1 (create-osc-thread "thread1" P5))
+(setf thd2 (create-osc-thread "thread2" P5))
+
+(setf sc-thd1 (create-osc-thread "SC/syn1/freq" SC))
+(setf sc-thd2 (create-osc-thread "SC/syn1/control" SC))
+;;; ====================== P5 ======================
+;;Rests don't trigger events (use for P5)
+(defun merge-rest-with-note (length)
+  (maybe-map (lambda (pattern)
+               (prog (out element store previous)
+                 (setf previous (car pattern))
+                 (setf store 0)
+                 loop
+                 (cond ((null pattern)
+                        (push store out)
+                        (return (nreverse (remove-zero out)))))
+                 (setf element (car pattern))
+                 (cond ((plusp element)
+                        (push store out)
+                        (setf store 0)
+                        (setf previous element)))
+                 (setf store (+ store (abs element)))
+                 (pop pattern)
+                 (go loop)))
+             length))
+;; ====================== THREAD 1 ======================
+(setf merged-values-A (merge-rest-with-note (omn :length instr-A)))
+(setf pitch-data1 (flatten (pitch-to-integer (omn :pitch instr-A))))
+(setf time-data1 (flatten (ratio-to-sec merged-values-A)))
+(setf data1 (gen-osc-data 
+             (* 3 span)
+             pitch-data1
+             :time time-data1
+             :min -200    ;Y Pos
+             :max 200     ;Y Pos
+             :bpm 60
+             :loop t))
+;; ====================== THREAD 2 ======================
+(setf merged-values-D (merge-rest-with-note (omn :length instr-D)))
+(setf pitch-data2 (flatten (pitch-to-integer (omn :pitch instr-D))))
+(setf time-data2 (flatten (ratio-to-sec (omn :length merged-values-D))))
+(setf data2 (gen-osc-data 
+             (* 3 span)
+             pitch-data2
+             :time time-data2
+             :min 0
+             :max 255
+             :bpm 60
+             :loop t))
+;;; ========= SUPERCOLLIDER =========
+;; THREAD 3
+;; Control Frequency in SC
+(setf pitch-data3 (flatten (pitch-to-integer (omn :pitch instr-B))))
+(setf time-data3 (flatten (ratio-to-sec (omn :length instr-B))))
+(setf data3 (gen-osc-data
+             (* 4 span)
+             pitch-data3
+             :time time-data3
+             :bpm 60
+             :loop t))
+;; THREAD 4
+;; Control Filter in SC
+(setf shape (list-plot (half-triangle 60 1.0 :phase 90 :modulation (gen-triangle 60 1 0.3))))
+(setf data4 (gen-osc-data 
+             (* 2 span)
+             (reverse (gen-integer-step 0 50 1))
+             :time (/ 1/4 50)
+             :min 200
+             :max 17000
+             :bpm 60
+             :loop t))
+
+(progn
+  (def-score osc-test
+             (
+              :key-signature 'chromatic
+              :time-signature '(4 4)
+              :tempo 60
+              :layout (list 
+                       (bracket-group
+                        (treble-layout 'inst1 :name "Violin")
+                        (treble-layout 'inst2 :name "To Supercollider")
+                        (treble-layout 'inst3 :name "Chords")
+                        (bass-layout 'inst4 :name "Bass")))
+              )
+    (inst1
+     :omn instr-A
+     :channel 1
+     :port "FROM OpusModus I")
+    (inst2
+     :omn instr-B
+     :channel 2
+     :port "FROM OpusModus I")
+    (inst3
+     :omn instr-C
+     :channel 3
+     :port "FROM OpusModus I")
+    (inst4
+     :omn instr-D
+     :channel 4
+     :port "FROM OpusModus I")
+    )
+  (audition-musicxml-last-score)
+  ;;; Animation
+  (send-osc-data thd1 data1) ;Melody
+  (send-osc-data thd2 data2) ;Bass
+  ;;; Sound 
+  (send-osc-data sc-thd1 data3) ;Foley - Pitch
+  ;(send-osc-data sc-thd2 data4) ;Foley - Control Data
+ )
+;(end-all-osc-threads)

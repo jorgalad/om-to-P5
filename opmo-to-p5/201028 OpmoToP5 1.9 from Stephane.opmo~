@@ -1,0 +1,86 @@
+(setf a.1.1 '((q c3 g3 ab3 g3) (f3 d4 gs3 g3)
+              (q f3 g3 ab3 g3) (f3 d3 eb3 d3)
+              (q b2 f3 eb3 d3) (g3 eb3 d3 b2)
+              (q d3 ab2 g2 f2) (ab2 g2 f2 b1)))
+
+(setf b.1.1 (pitch-transpose 12 (do-section '(- x) '(sort-asc x) a.1.1)))
+(setf b.1.2 (make-omn :pitch (omn :pitch b.1.1) :length (gen-repeat 64 '(1/8))))
+
+;;; ========= ASSEMBLE =========
+(setf instr-A (assemble-seq a.1.1))
+(setf instr-B (assemble-seq b.1.2))
+
+
+(setf ts-list (get-time-signature a.1.1))
+(setf span (get-span ts-list :sum t))
+
+
+;;; ========= OSC =========
+(defparameter P5 '(127.0.0.1 57121))
+(defparameter SC '(127.0.0.1 57120))
+
+;(defparameter SC '(127.0.0.1 8000))
+
+(setf thd1 (create-osc-thread "thread1" P5))
+(setf thd2 (create-osc-thread "thread2" P5))
+(setf thd3 (create-osc-thread "SC/syn1/freq" SC))
+
+;;; ========= P5 =========
+;; THREAD 1
+(setf pitch-data1 (flatten (abs! (interval-to-integer (pitch-to-interval (omn :pitch a.1.1))))))
+(setf time-data1 (flatten (ratio-to-sec (omn :length a.1.1) :ratio 1/4)))
+(setf data1 (gen-osc-data 
+                          (* 2 span)
+                          pitch-data1
+                         :time  time-data1
+                         :bpm 60
+                         :loop t))
+
+;; THREAD 2
+(setf pitch-data2 (flatten (abs! (interval-to-integer (pitch-to-interval (omn :pitch b.1.2))))))
+(setf time-data2 (flatten (ratio-to-sec (omn :length b.1.2) :ratio 1/4)))
+(setf data2 (gen-osc-data 
+                          (* 2 span)
+                          pitch-data2
+                         :time  time-data2
+                         :bpm 60
+                         :loop t))
+
+;;; ========= SUPERCOLLIDER =========
+;; THREAD 3
+(setf pitch-data3 (flatten (abs! (interval-to-integer (pitch-to-interval (omn :pitch b.1.2))))))
+(setf time-data3 (flatten (ratio-to-sec (omn :length b.1.2) :ratio 1/4)))
+(setf data3 (gen-osc-data 
+                          (* 2 span)
+                          pitch-data3
+                         :time  time-data3
+                         :bpm 60
+                         :loop t))
+(progn
+  (def-score osc-test
+             (
+              :key-signature 'chromatic
+              :time-signature '(4 4)
+              :tempo 60
+              :layout (list 
+                       (bracket-group
+                        (treble-layout 'inst2)
+                        (bass-layout 'inst1)))
+              )
+    (inst1
+     :omn instr-A
+     :channel 1
+     :port "FROM OpusModus I")
+    (inst2
+     :omn instr-B
+     :channel 1
+     :port "FROM OpusModus I")
+    )
+  (audition-musicxml-last-score)
+  ;(send-osc-data thd1 data1)
+  ;(send-osc-data thd2 data2)
+  (send-osc-data thd3 data3)
+ )
+;(end-all-osc-threads)
+
+

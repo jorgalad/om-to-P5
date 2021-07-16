@@ -22,7 +22,7 @@ function convertRange(value, low, high) {
 }
 
 function setup() {
-  createCanvas(600, 400, WEBGL);
+  createCanvas(1000, 800, WEBGL);
   stroke(255);
   noLoop();
   // frameRate(25);
@@ -32,7 +32,7 @@ function setup() {
 }
 
 function draw() {
-  background(0);
+  background(255);
 }
 
 function inMessage(oscMessage) {
@@ -44,7 +44,7 @@ function inMessage(oscMessage) {
   }
   if (Object.values(oscMessage).indexOf(`/thread2`) > -1) {
     const {args} = oscMessage;
-    console.log(`Thread 2 Value 1: ${args[0]}`)
+    // console.log(`Thread 2 Value 1: ${args[0]}`)
     thread_2(args[0]);
   };
 
@@ -67,23 +67,24 @@ function inMessage(oscMessage) {
 
 
 function thread_1 (t1) {
-  console.log(`Thread 1 Value 1: ${t1}`)
+  console.log(`Thread 1 Value: ${t1}`)
   let t1conv = ( t1[0] - 0 )  * ( 200 - 0 );
   // background(conv2, oscValues[0] *  120, 90);
   y = y - 15;
-  line(-300, y+t1conv, 400, -100 + y);
-  stroke(255);
-  // ellipse(15, 15, 40, + y);
+  // line(-500, y+t1conv, 400, -100 + y);
+  line(-500, t1, 400, -100 + y);
+  stroke(150, t1, 130);
   strokeWeight(2)
 }
 
 function thread_2 (t2) {
   console.log(`Thread 2 Value: ${t2}`)
-  let t2conv = ( t2[0] - 0 )  * ( 200 - 0 );
   y = y - 15;
   // line(50, y+t2conv, 400, -100 + y);
-  line(-300, y-t2conv, 400, 100 - y);
-  stroke(56, 210, 190)
+  //line(-300, y-t2conv, 400, 100 - y);
+  line(-700, y-400, 100, 100 - y);
+  stroke(map(t2, 0, 255, 50, 100), map(t2, 0, 255, 90, 150), map(t2, 0, 255, 20, 80))
+  //stroke(t2, t2, t2);
   strokeWeight(2)
 
 
@@ -92,4 +93,3 @@ function thread_2 (t2) {
   // console.log(t2)
   // line(300, 200+t2, 400, 200+t2);
 }
-
